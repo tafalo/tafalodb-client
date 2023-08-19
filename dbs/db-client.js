@@ -1,5 +1,5 @@
 const url = require('url');
-const axiosRe = require('axios')
+const axios = require('axios').default;
 
 class ReadData {
 
@@ -10,7 +10,7 @@ class ReadData {
     #__load = false;
     #__domain = "https://db.pitoall.com";
     constructor() {
-        this.axios = new axiosRe.Axios();
+        
     }
     get domain2() {
         return this.#__domain;
@@ -22,7 +22,7 @@ class ReadData {
         return this.#__token;
     }
     set token(v) {
-        this.#__token = this.token;
+        this.#__token = v;
     }
     connectDB(urlConnect, callback) {
         
@@ -36,11 +36,12 @@ class ReadData {
         
         if (protocol === 'tafalodb') {
             // Load từ khoá tại đây, và sẽ sinh ra token tại đây
-            this.postJson(this.renUrl("/connect"), {
+            this.postJson("/connect", {
                 protocol, hostname, port, username, password, databaseName
-            }, (rs) => {
+            }, async (rs) => {
                 if(rs.result) {
                     this.token = rs.token;
+                   await this.loadData();
                     (typeof callback == 'function') && callback({result: true, msg: "Kết nối thành công"});
                 } else {
                     (typeof callback == 'function') && callback({result: false, msg: "Kết nối thất bại"});
@@ -75,9 +76,10 @@ class ReadData {
     }
     async postJson(url, data, callback) {
         try {
-            var res = await this.axios.post(this.renUrl(url), data, {
+            console.log(111,this.#__token);
+            var res = await axios.post(this.renUrl(url), data, {
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     "token": this.#__token
                 }
             })
@@ -91,7 +93,7 @@ class ReadData {
             (typeof callback == 'function') && callback(rr);
             return rr;
         } catch (error) {
-            console.log(error);
+           // console.log(error);
             var rr = { result: false, code: 204, msg: "Liên hệ với kỹ thuật" };
             (typeof callback == 'function') && callback(rr);
             return rr;
@@ -249,7 +251,7 @@ class ReadData {
             (typeof callback == 'function') && callback({result: false, msg: "Lỗi kết nối db"});
             return;
         }
-        this.postJson("/get-all-table", {}, callback);
+        this.postJson("/get-all-table2", {}, callback);
     }
     // filter áp dụng luật filter có bao gồm là bảng
     findData(filter, callback) {
