@@ -1,4 +1,3 @@
-//https://github.com/FightLightDiamond/aoerandom/blob/master/package.json
 const url = require('url');
 const axiosRe = require('axios')
 
@@ -16,10 +15,17 @@ class ReadData {
     get domain2() {
         return this.#__domain;
     }
+    set domain(v) {
+        this.#__domain = v;
+    }
     get token() {
         return this.#__token;
     }
-    connectDB(urlConnect) {
+    set token(v) {
+        this.#__token = this.token;
+    }
+    connectDB(urlConnect, callback) {
+        
         const parsedUrl = url.parse(urlConnect);
         const protocol = parsedUrl.protocol.replace(':', ''); // Lấy giao thức, ví dụ: "tafalodb"
         const username = parsedUrl.auth.split(':')[0]; // Lấy username
@@ -27,14 +33,22 @@ class ReadData {
         const hostname = parsedUrl.hostname; // Lấy hostname
         const port = parsedUrl.port; // Lấy port
         const databaseName = parsedUrl.pathname.replace('/', '');
-        this.#__domain = 'https://' + hostname + ":" + port;
+        
         if (protocol === 'tafalodb') {
             // Load từ khoá tại đây, và sẽ sinh ra token tại đây
-            console.log("ok");
-            return true;
+            this.postJson(this.renUrl("/connect"), {
+                protocol, hostname, port, username, password, databaseName
+            }, (rs) => {
+                if(rs.result) {
+                    this.token = rs.token;
+                    (typeof callback == 'function') && callback({result: true, msg: "Kết nối thành công"});
+                } else {
+                    (typeof callback == 'function') && callback({result: false, msg: "Kết nối thất bại"});
+                }
+            })
+            
         } else {
-            console.log("false");
-            return false;
+            (typeof callback == 'function') && callback({result: false, msg: "Cấu trúc không hợp lệ"});
         }
     }
     renUrl(url) {
