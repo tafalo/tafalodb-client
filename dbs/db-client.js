@@ -8,7 +8,7 @@ class ReadData {
     #__token = "";
     #__typeObj = new Set(["[object Array]", "[object Object]"]);
     #__load = false;
-    #__domain = "";
+    #__domain = "https://db.pitoall.com";
     constructor() {
         this.axios = new axiosRe.Axios();
     }
