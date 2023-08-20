@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+message ResultData {
+  string data=1 [default=""];
+}
+
+message QueryReq {
+  string query=1 [default=""];
+}
+message QueryConnect {
+    string protocol = 1;
+    string username=2;
+    string password=3;
+    string databaseName=4;
+}
+
+service QueryService {
+    rpc ConnectDB(QueryConnect) returns (ResultData) {}
+    rpc LoadInit(QueryReq) returns (ReadData) {}
+    rpc GetAllTable(QueryReq) returns (ResultData) {}
+    rpc Find(QueryReq) returns (ResultData) {}
+    rpc InsertOne(QueryReq) returns (ResultData) {}
+    rpc InsertMany(QueryReq) returns (ResultData) {}
+    rpc UpdateMany(QueryReq) returns (ResultData) {}
+    rpc DeleteMany(QueryReq) returns (ResultData) {}
+}
